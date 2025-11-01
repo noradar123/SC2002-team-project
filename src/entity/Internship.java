@@ -43,6 +43,7 @@ public class Internship {
     public void setStatus(InternshipStatus status) { this.status = status; }
     public String getMajors() { return preferredMajor; }
     public InternshipLevel getLevel() { return level; }
+    public String getTitle() {return title;}
     public LocalDate getClosingDate() { return closeDate; }
     public LocalDate getOpenDate() { return openDate; }
     public boolean isVisible() { return visible; }

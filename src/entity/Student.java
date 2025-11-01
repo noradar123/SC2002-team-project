@@ -26,7 +26,7 @@ public class Student extends User {
         this.applications = new ArrayList<>();
         this.acceptedApplication = null;
     }
-
+    
     public int getYearOfStudy() {
         return yearOfStudy;
     }

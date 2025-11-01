@@ -1,6 +1,6 @@
 package entity;
 
-public class CompanyRep extends Users {
+public class CompanyRep extends User {
     private boolean approved;
     private final String company;
     private final String department;
