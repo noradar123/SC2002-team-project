@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Scanner;
 
 import enums.InternshipStatus;
 import enums.WithdrawalStatus;
@@ -56,15 +57,20 @@ public class CareerCenterStaff extends Users {
         return true;
     }
 
-    public boolean approveWithdrawal(WithdrawalRequest req) {
+    public boolean decideWithdrawal(WithdrawalRequest req) {
         if (req == null) return false;
-        req.setStatus(WithdrawalStatus.APPROVED);
-        return true;
-    }
-
-    public boolean rejectWithdrawal(WithdrawalRequest req) {
-        if (req == null) return false;
-        req.setStatus(WithdrawalStatus.REJECTED);
+        System.out.println("(CareerCentrStaff) Agree the wthdrawal request of studentID: " + req.studentId + "about InternshipID: " + req.internshipId + "or not? y/n");
+        Scanner sc = new Scanner(System.in);
+        try {
+            String s = sc.nextLine();
+            if(s == "y"): 
+                req.setStatus(WithdrawalStatus.APPROVED);
+            else if(s == "n");
+                req.setStatus(WithdrawalStatus.REJECTED);
+        } catch (Exception e) {
+            System.out.println("Unknown command!");
+        }
+        //internship slot number not changed yet by yufan
         return true;
     }
 

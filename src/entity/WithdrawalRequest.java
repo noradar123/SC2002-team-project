@@ -26,7 +26,7 @@ public class WithdrawalRequest {
         System.out.println("Withdrawal request submitted for student " + studentId + " with reason: " + reason);
     }
 
-    public void updateStatus(WithdrawalStatus status) {
+    public void setStatus(WithdrawalStatus status) {
         this.status = status;
         System.out.println("Withdrawal request " + requestId + " updated to status: " + status);
     }
