@@ -1,5 +1,4 @@
 /bin/
-# === Eclipse ===
 .settings/
 .project
 .classpath
