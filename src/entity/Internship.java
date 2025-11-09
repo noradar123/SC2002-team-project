@@ -91,7 +91,7 @@ public class Internship {
         return true;
     }
 
-    public void setVisibility(boolean visible) { if (canSet()) this.visible = visible; }
+    public void setVisibility(boolean visible) { this.visible = visible; }
     public void setTitle(String title) { if (canSet()) this.title = title; }
     public void setDescription(String description) { if (canSet()) this.description = description; }
     public void setLevel(InternshipLevel level) { if (canSet()) this.level = level; }
@@ -120,6 +120,10 @@ public class Internship {
         applicationList.add(application);
         filledSlots++;
         return true;
+    }
+    
+    public boolean isClosingDatePassed() {
+    	return LocalDate.now().isAfter(closeDate);
     }
 
     @Override

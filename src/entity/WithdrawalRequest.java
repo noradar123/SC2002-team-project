@@ -1,3 +1,4 @@
+
 import java.time.LocalDate;
 
 public class WithdrawalRequest {
@@ -23,12 +24,10 @@ public class WithdrawalRequest {
         this.reason = reason;
         this.requestDate = LocalDate.now();
         this.status = WithdrawalStatus.PENDING;
-        System.out.println("Withdrawal request submitted for student " + studentId + " with reason: " + reason);
     }
 
     public void setStatus(WithdrawalStatus status) {
         this.status = status;
-        System.out.println("Withdrawal request " + requestId + " updated to status: " + status);
     }
 
     // Getters

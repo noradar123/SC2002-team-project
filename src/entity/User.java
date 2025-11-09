@@ -4,7 +4,7 @@ public abstract class User {
     private final String userId;
     private final String name;
     private String password;
-
+    
     public User(String userId, String name, String password) {
         if (userId == null || name == null || password == null) {
             throw new IllegalArgumentException("userId, name, and password must not be null");
@@ -30,7 +30,11 @@ public abstract class User {
     public boolean verifyPassword(String raw) {
         return raw != null && raw.equals(this.password); // swap to PasswordHasher later if you add one
     }
-
+    
+    public String getPassword() {
+    	return password;
+    }
+    
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{userId='" + userId + "', name='" + name + "'}";

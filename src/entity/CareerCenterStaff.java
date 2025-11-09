@@ -15,7 +15,7 @@ import entity.ReportFilter;
 import entity.Report;
 
 
-public class CareerCenterStaff extends Users {
+public class CareerCenterStaff extends User {
     private String staffDepartment;
 
     public CareerCenterStaff(String userId, String name, String password, String staffDepartment) {
@@ -57,22 +57,20 @@ public class CareerCenterStaff extends Users {
         return true;
     }
 
-    public boolean decideWithdrawal(WithdrawalRequest req) {
-        if (req == null) return false;
-        System.out.println("(CareerCentrStaff) Agree the wthdrawal request of studentID: " + req.studentId + "about InternshipID: " + req.internshipId + "or not? y/n");
-        Scanner sc = new Scanner(System.in);
-        try {
-            String s = sc.nextLine();
-            if(s == "y"): 
-                req.setStatus(WithdrawalStatus.APPROVED);
-            else if(s == "n");
-                req.setStatus(WithdrawalStatus.REJECTED);
-        } catch (Exception e) {
-            System.out.println("Unknown command!");
-        }
-        //internship slot number not changed yet by yufan
-        return true;
+public boolean decideWithdrawal(WithdrawalRequest req, boolean approve) {
+    if (req == null) return false;
+
+    if (req.getStatus() != WithdrawalStatus.PENDING) {
+        return false;
     }
+
+    if (approve) {
+        req.setStatus(WithdrawalStatus.APPROVED);
+    } else {
+        req.setStatus(WithdrawalStatus.REJECTED);
+    }
+    return true;
+}
 
     public Report generateReport(ReportFilter filter, List<Internship> allOpportunities) {
         List<Internship> included = new ArrayList<>();

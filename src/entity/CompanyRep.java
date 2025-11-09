@@ -6,6 +6,7 @@ public class CompanyRep extends User {
     private final String department;
     private final String position;
     private int numberOfInternships;
+    private boolean authorized;
 
     public CompanyRep(String userId, String name, String password,
                       String company, String department, String position) {
@@ -15,6 +16,7 @@ public class CompanyRep extends User {
         this.position = position;
         this.approved = false;
         this.numberOfInternships = 0;
+        this.authorized = false;
     }
 
     public boolean isApproved() { return approved; }
@@ -25,11 +27,16 @@ public class CompanyRep extends User {
     public String getCompany() { return company; }
     public String getDepartment() { return department; }
     public String getPosition() { return position; }
+    public boolean isAuthorized() {return authorized;}
 
     public int getNumberOfInternships() { return numberOfInternships; }
     public void incrementInternships() { numberOfInternships++; }
     public void decrementInternships() { if (numberOfInternships > 0) numberOfInternships--; }
 
+    public void setAuthorized(boolean authorized) {
+    	this.authorized = authorized;
+    }
+    
     @Override
     public String toString() {
         return String.format("CompanyRep[userId=%s, name=%s, company=%s, dept=%s, position=%s, approved=%b, internships=%d]",

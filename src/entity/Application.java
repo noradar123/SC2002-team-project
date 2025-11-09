@@ -3,8 +3,6 @@ package entity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
-import java.util.List;
 import enums.ApplicationStatus;
 
 public class Application {
@@ -36,7 +34,7 @@ public class Application {
 	
 	//getters//
 	public String getApplicationID() {return applicationID;}
-	public String getStudent() {return student;}
+	public Student getStudent() {return student;}
 	public Internship getInternship() {return internship;}
 	public ApplicationStatus getStatus() {return status;}
 	public LocalDate getApplicationDate() {return applicationDate;}
