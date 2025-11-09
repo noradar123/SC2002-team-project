@@ -63,7 +63,6 @@ public boolean decideWithdrawal(WithdrawalRequest req, boolean approve) {
     if (req.getStatus() != WithdrawalStatus.PENDING) {
         return false;
     }
-
     if (approve) {
         req.setStatus(WithdrawalStatus.APPROVED);
     } else {
