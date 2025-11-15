@@ -24,6 +24,15 @@ public class Application {
 		this.withdrawalRequested = false;
 		this.withdrawn = false;
 	}
+	public Application(Student student, Internship internship, ApplicationStatus status) {
+		this.applicationID = generateApplicationID();
+		this.student = student;
+		this.internship = internship;
+		this.status = status;
+		this.applicationDate = LocalDate.now();
+		this.withdrawalRequested = false;
+		this.withdrawn = false;
+	}
 	// Generating applicationID -- returning something like: APP-YYYYMMDD-#### //
 	public String generateApplicationID() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");

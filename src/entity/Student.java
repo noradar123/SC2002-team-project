@@ -5,15 +5,16 @@ import java.util.Collections;
 import java.util.List;
 
 import enums.ApplicationStatus;
+import enums.InternshipLevel;
 
 public class Student extends User {
-    private final int yearOfStudy;                 
-    private final String major;                    
+    private final int yearOfStudy;
+    private final String major;
     private final List<Application> applications;  // up to 3 concurrent
     private Application acceptedApplication;       // 0..1
 
     public Student(String userId, String name, String password,
-                    int yearOfStudy, String major) {
+                   int yearOfStudy, String major) {
         super(userId, name, password);
         if (yearOfStudy < 1 || yearOfStudy > 4) {
             throw new IllegalArgumentException("yearOfStudy must be between 1 and 4");
@@ -26,7 +27,7 @@ public class Student extends User {
         this.applications = new ArrayList<>();
         this.acceptedApplication = null;
     }
-    
+
     public int getYearOfStudy() {
         return yearOfStudy;
     }
@@ -47,6 +48,7 @@ public class Student extends User {
         return acceptedApplication;
     }
 
+
     public boolean canApplyTo(Internship internship) {
         if (internship == null) return false;
 
@@ -54,7 +56,7 @@ public class Student extends User {
         switch (yearOfStudy) {
             case 1:
             case 2:
-                return internship.getLevel() == enums.InternshipLevel.BASIC;
+                return internship.getLevel() == InternshipLevel.BASIC;
             case 3:
             case 4:
             default:
@@ -62,7 +64,7 @@ public class Student extends User {
         }
     }
 
-     public boolean applyFor(Internship internship) {
+    public boolean applyFor(Internship internship) {
         if (internship == null) return false;
         if (getActiveApplicationCount() >= 3) return false;
         if (!canApplyTo(internship)) return false;
@@ -78,25 +80,41 @@ public class Student extends User {
         app.requestWithdrawal();
         return true;
     }
-    
+
     public int getActiveApplicationCount() {
         int cnt = 0;
         for (Application a : applications) {
             if (a == null) continue;
-            if (a.getStatus() == enums.ApplicationStatus.PENDING && !a.isWithdrawn()) {
+            if (a.getStatus() == ApplicationStatus.PENDING && !a.isWithdrawn()) {
                 cnt++;
             }
         }
         return cnt;
     }
 
+
     public boolean accept(Application app) {
         if (app == null) return false;
-        if (hasAcceptedPlacement()) return false;
+
+        // The application must belong to this student
         if (!applications.contains(app)) return false;
-        if (app.getStatus() != ApplicationStatus.SUCCESSFUL) return false;
+
+        if (hasAcceptedPlacement()) return false;
+
+        if (app.getStatus() != ApplicationStatus.SUCCESSFUL || app.isWithdrawn()) {
+            return false;
+        }
 
         this.acceptedApplication = app;
+
+        // Automatically withdraw all other active applications
+        for (Application other : applications) {
+            if (other == app) continue; // skip the one we just accepted
+            if (other.isActive()) {
+                other.withdrawDueToOtherAcceptance();
+            }
+        }
+
         return true;
     }
 

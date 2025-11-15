@@ -132,4 +132,8 @@ public class Internship {
         return String.format("Internship[title=%s, company=%s, level=%s, major=%s, status=%s, visible=%b, slots=%d/%d, open=%s, close=%s]",
                 title, company, level, preferredMajor, status, visible, filledSlots, slots, openDate, closeDate);
     }
+    public String getDescription() {
+        return description;
+    }
+
 }
