@@ -1,13 +1,13 @@
 package entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import enums.InternshipLevel;
 import enums.InternshipStatus;
+import java.util.UUID;
 
 public class Internship {
 
+    private final String id;          
     private String title;
     private String description;
     private InternshipLevel level;
@@ -19,12 +19,13 @@ public class Internship {
     private final String company;
     private final int slots;
     private int filledSlots;
-    private final List<Application> applicationList = new ArrayList<>();
 
+    // Constructor
     public Internship(String title, String description, InternshipLevel level,
                       String preferredMajor, LocalDate openDate,
-                      LocalDate closeDate, String company,
-                      int totalSlots) {
+                      LocalDate closeDate, String company, int slots) {
+
+        this.id = UUID.randomUUID().toString(); 
         this.title = title;
         this.description = description;
         this.level = level;
@@ -32,40 +33,45 @@ public class Internship {
         this.openDate = openDate;
         this.closeDate = closeDate;
         this.company = company;
-        this.slots = totalSlots;
+        this.slots = slots;
         this.filledSlots = 0;
         this.status = InternshipStatus.PENDING;
         this.visible = false;
     }
 
-    public String getCompany() { return company; }
-    public InternshipStatus getStatus() { return status; }
-    public void setStatus(InternshipStatus status) { this.status = status; }
-    public String getMajors() { return preferredMajor; }
+    // Getters
+    public String getId() { return id; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
     public InternshipLevel getLevel() { return level; }
-    public String getTitle() {return title;}
-    public LocalDate getClosingDate() { return closeDate; }
+    public String getPreferredMajor() { return preferredMajor; }
     public LocalDate getOpenDate() { return openDate; }
+    public LocalDate getClosingDate() { return closeDate; }
+    public InternshipStatus getStatus() { return status; }
     public boolean isVisible() { return visible; }
+    public String getCompany() { return company; }
     public int getSlots() { return slots; }
     public int getFilledSlots() { return filledSlots; }
-    public List<Application> getApplicationList() { return applicationList; }
 
-    public void incrementFilled() { filledSlots++; }
-
-    public boolean canStudentApply(Student student, LocalDate now) {
-        if (now.isBefore(openDate) || now.isAfter(closeDate)) return false;
-        if (!visible) return false;
-        if (status != InternshipStatus.APPROVED) return false;
-        if (!student.getMajor().equals(preferredMajor)) return false;
-        if (!isStudentYearEligible(student.getYearOfStudy())) return false;
-        for (Application app : applicationList) {
-            if (app.getStudent().equals(student)) return false;
-        }
-        return true;
+    // Setters 
+    public void setTitle(String title) { this.title = title; }
+    public void setDescription(String description) { this.description = description; }
+    public void setLevel(InternshipLevel level) { this.level = level; }
+    public void setPreferredMajor(String major) { this.preferredMajor = major; }
+    public void setOpenDate(LocalDate openDate) {
+        if (closeDate != null && !openDate.isBefore(closeDate)) return;
+        this.openDate = openDate;
     }
+    public void setCloseDate(LocalDate closeDate) {
+        if (openDate != null && !closeDate.isAfter(openDate)) return;
+        this.closeDate = closeDate;
+    }
+    public void setStatus(InternshipStatus status) { this.status = status; }
+    public void setVisible(boolean visible) { this.visible = visible; }
+    public void setFilledSlots(int filledSlots) { this.filledSlots = filledSlots; }
 
-    private boolean isStudentYearEligible(int year) {
+    // Utility methods
+    public boolean isStudentYearEligible(int year) {
         switch (level) {
             case BASIC: return true;
             case INTERMEDIATE:
@@ -74,66 +80,16 @@ public class Internship {
         }
     }
 
-    public boolean checkIfFull() {
-        if (filledSlots >= slots) {
-            visible = false;
-            status = InternshipStatus.FILLED;
-            return true;
-        }
-        return false;
+    // Update this internship's fields from another internship object
+    public void updateFrom(Internship other) {
+        this.title = other.title;
+        this.description = other.description;
+        this.level = other.level;
+        this.preferredMajor = other.preferredMajor;
+        this.openDate = other.openDate;
+        this.closeDate = other.closeDate;
+        this.status = other.status;
+        this.visible = other.visible;
+        this.filledSlots = other.filledSlots;
     }
-
-    public boolean canSet() {
-        if (status != InternshipStatus.PENDING) {
-            System.out.println("Cannot edit because status is not PENDING.");
-            return false;
-        }
-        return true;
-    }
-
-    public void setVisibility(boolean visible) { this.visible = visible; }
-    public void setTitle(String title) { if (canSet()) this.title = title; }
-    public void setDescription(String description) { if (canSet()) this.description = description; }
-    public void setLevel(InternshipLevel level) { if (canSet()) this.level = level; }
-    public void setMajor(String major) { if (canSet()) this.preferredMajor = major; }
-
-    public void setOpenDate(LocalDate openDate) {
-        if (openDate == null) { System.out.println("Open date cannot be null; no change is made."); return; }
-        if (closeDate != null && !openDate.isBefore(closeDate)) {
-            System.out.println("Open date must be before close date; no change is made.");
-            return;
-        }
-        this.openDate = openDate;
-    }
-
-    public void setCloseDate(LocalDate closeDate) {
-        if (closeDate == null) { System.out.println("Close date cannot be null; no change is made."); return; }
-        if (openDate != null && !closeDate.isAfter(openDate)) {
-            System.out.println("Close date must be after open date; no change is made.");
-            return;
-        }
-        this.closeDate = closeDate;
-    }
-
-    public boolean addApplication(Application application) {
-        if (!canStudentApply(application.getStudent(), LocalDate.now())) return false;
-        applicationList.add(application);
-        filledSlots++;
-        return true;
-    }
-    
-    public boolean isClosingDatePassed() {
-    	return LocalDate.now().isAfter(closeDate);
-    }
-
-    @Override
-    //change later depending on 
-    public String toString() {
-        return String.format("Internship[title=%s, company=%s, level=%s, major=%s, status=%s, visible=%b, slots=%d/%d, open=%s, close=%s]",
-                title, company, level, preferredMajor, status, visible, filledSlots, slots, openDate, closeDate);
-    }
-    public String getDescription() {
-        return description;
-    }
-
 }

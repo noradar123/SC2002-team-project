@@ -1,9 +1,13 @@
 package entity;
 
+import filter.CompositeFilter;
+
+
 public abstract class User {
     private final String userId;
     private final String name;
     private String password;
+    private CompositeFilter<Internship> filter;
     
     public User(String userId, String name, String password) {
         if (userId == null || name == null || password == null) {
@@ -12,6 +16,7 @@ public abstract class User {
         this.userId = userId;
         this.name = name;
         this.password = password;
+        this.filter = null;
     }
 
     public String getUserId() {
@@ -35,8 +40,9 @@ public abstract class User {
     	return password;
     }
     
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{userId='" + userId + "', name='" + name + "'}";
-    }
+    public CompositeFilter<Internship> getFilter() {
+		return filter;
+	}
+    public void setFilter(CompositeFilter<Internship> filter) {this.filter = filter;}
+    
 }

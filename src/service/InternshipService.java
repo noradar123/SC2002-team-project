@@ -1,22 +1,44 @@
 package service;
 
+import data.InternshipRepository;
+import data.ApplicationRepository;
 import entity.Internship;
+import entity.User;
+
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
-public interface InternshipService {
+public class InternshipService {
 
-    List<Internship> getAllInternships();
+    private final InternshipRepository repo;
 
-    Internship getInternshipById(String internshipId);
+    public InternshipService(InternshipRepository repo) {
+        this.repo = repo;
+    }
 
-    List<Internship> filterInternships(Map<String, String> filters);
+    // return a list of internships based on the user filter settings
+    public List<Internship> getInternshipsFor(User user) {
+    	return repo.all().stream()
+    	        .filter(i -> user.getFilter().matches(i))
+    	        .collect(Collectors.toList());
+    }
 
-    List<Internship> getInternshipsByCompany(String companyId);
-
-    boolean checkInternshipEligibility(String studentId, String internshipId);
-
-    boolean updateInternshipStatus(String internshipId, String status);
-
-    boolean toggleVisibility(String internshipId, boolean isVisible);
+	// Edit internship if status is PENDING
+    
+    public void editInternship(String id, Internship updated) {
+        Internship existing = repo.findById(id);
+        if (existing == null) throw new IllegalArgumentException("Internship not found: " + id);
+        if (existing.getStatus() != null && existing.getStatus().name().equals("PENDING")) {
+            repo.update(updated);
+        } else {
+            throw new IllegalStateException("Cannot edit internship unless status is PENDING");
+        }
+    }
+    // Mark as filled
+    public void markAsFilled(Internship internship) {
+        if (internship.getFilledSlots() >= internship.getSlots()) {
+            internship.setVisible(false);
+            internship.setStatus(enums.InternshipStatus.FILLED);
+        }
+    }
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import enums.ApplicationStatus;
 
 public class Application {
+	
 	private static AtomicInteger idCounter = new AtomicInteger(1);
 	private String applicationID;
 	private Student student; 

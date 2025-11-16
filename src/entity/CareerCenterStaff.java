@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import enums.InternshipStatus;
 import enums.WithdrawalStatus;
+import filter.CareerCentreStaffFilter;
 import service.InternshipServiceImpl;
 import store.InternshipRepository;
 
@@ -20,6 +21,7 @@ public class CareerCenterStaff extends User {
         super(userId, name, password);
         this.staffDepartment = staffDepartment;
         this.internshipService = internshipService;  // Assign the injected service
+        super.setFilter(new CareerCentreStaffFilter(this)); // No specific filter for CareerCenterStaff
     }
 
     // Getter and Setter for staff department

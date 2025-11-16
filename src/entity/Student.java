@@ -6,6 +6,7 @@ import java.util.List;
 
 import enums.ApplicationStatus;
 import enums.InternshipLevel;
+import filter.StudentFilter;
 
 public class Student extends User {
     private final int yearOfStudy;
@@ -15,7 +16,7 @@ public class Student extends User {
 
     public Student(String userId, String name, String password,
                    int yearOfStudy, String major) {
-        super(userId, name, password);
+        super(userId, name, password); // placeholder, will set properly below
         if (yearOfStudy < 1 || yearOfStudy > 4) {
             throw new IllegalArgumentException("yearOfStudy must be between 1 and 4");
         }
@@ -26,6 +27,9 @@ public class Student extends User {
         this.major = major;
         this.applications = new ArrayList<>();
         this.acceptedApplication = null;
+        
+        // this one is for filtering internships for the student
+        super.setFilter(new StudentFilter(this));
     }
 
     public int getYearOfStudy() {

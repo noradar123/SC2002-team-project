@@ -1,5 +1,7 @@
 package entity;
 
+import filter.CompanyRepFilter;
+
 public class CompanyRep extends User {
     private boolean approved;
     private final String company;
@@ -17,12 +19,13 @@ public class CompanyRep extends User {
         this.approved = false;
         this.numberOfInternships = 0;
         this.authorized = false;
+        
+        CompanyRepFilter filter = new CompanyRepFilter(this);
+        super.setFilter(filter);
     }
 
     public boolean isApproved() { return approved; }
     public void approveByCCS() { this.approved = true; }
-
-    public boolean loginIfApproved(String password) { return approved && login(password); }
 
     public String getCompany() { return company; }
     public String getDepartment() { return department; }
@@ -35,11 +38,5 @@ public class CompanyRep extends User {
 
     public void setAuthorized(boolean authorized) {
     	this.authorized = authorized;
-    }
-    
-    @Override
-    public String toString() {
-        return String.format("CompanyRep[userId=%s, name=%s, company=%s, dept=%s, position=%s, approved=%b, internships=%d]",
-                getUserId(), getName(), company, department, position, approved, numberOfInternships);
     }
 }
