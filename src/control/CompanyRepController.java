@@ -6,6 +6,7 @@ import java.util.List;
 import boundary.CompanyRepView;
 import entity.CompanyRep;
 import entity.Internship;
+import entity.Application;
 import enums.InternshipLevel;
 import enums.InternshipStatus;
 import service.InternshipService;
@@ -14,10 +15,85 @@ public class CompanyRepController {
 
     private final CompanyRepView view;
     private final InternshipService internshipService;
+    private final ApplicationController applicationController;
+    private final FilterController filterController;
 
-    public CompanyRepController(CompanyRepView view, InternshipService internshipService) {
+    public CompanyRepController(CompanyRepView view, InternshipService internshipService, ApplicationController applicationController, FilterController filterController) {
         this.view = view;
         this.internshipService = internshipService;
+        this.applicationController = applicationController;
+        this.filterController = filterController;
+    }
+
+    // Main menu loop for CompanyRep
+    public void showMain(CompanyRep rep) {
+        while (true) {
+            int opt = view.promptMainMenuOption();
+            switch (opt) {
+                case 0:
+                    return;
+                case 1:
+                    createInternship(rep);
+                    break;
+                case 2:
+                    editInternship(rep);
+                    break;
+                case 3:
+                    deleteInternship(rep);
+                    break;
+                case 4:
+                    toggleVisibility(rep);
+                    break;
+                case 5:
+                    listMyInternships(rep);
+                    break;
+                case 6:
+                    manageApplications(rep);
+                    break;
+                case 7:
+                    filterController.manageFiltersFor(rep);
+                    break;
+                default:
+                    view.show("Unknown option.");
+            }
+        }
+    }
+
+    // Manage applications for an internship (approve/reject)
+    public void manageApplications(CompanyRep rep) {
+        List<Internship> mine = internshipService.getInternshipsFor(rep.getCompany());
+        if (mine.isEmpty()) {
+            view.show("No internships to manage applications for.");
+            return;
+        }
+
+        view.listInternships(mine);
+        int idx = view.promptIndexSelection(mine.size());
+        Internship selected = mine.get(idx);
+
+        // fetch applications for the internship
+        List<Application> apps = applicationController.getApplicationByInternshipTitle(selected.getTitle());
+        if (apps.isEmpty()) {
+            view.show("No applications for this internship.");
+            return;
+        }
+
+        view.listApplications(apps);
+        int aidx = view.promptIndexSelection(apps.size());
+        Application chosen = apps.get(aidx);
+
+        String action = view.promptApproveOrReject();
+        try {
+            if (action.equals("approve")) {
+                applicationController.approveApplication(chosen.getApplicationID());
+                view.show("Application approved: " + chosen.getApplicationID());
+            } else {
+                applicationController.rejectApplication(chosen.getApplicationID());
+                view.show("Application rejected: " + chosen.getApplicationID());
+            }
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            view.show(e.getMessage());
+        }
     }
 
     // Create a new internship
@@ -52,7 +128,7 @@ public class CompanyRepController {
                     rep, title, desc, level, major, open, close, slots
             );
             view.show("Created: " + internship.getTitle());
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             view.show(e.getMessage());
         }
     }
@@ -105,8 +181,8 @@ public class CompanyRepController {
 
         try {
             internshipService.deleteInternship(rep, selected.getId());
-            view.show("Deleted: " + selected.getSummary());
-        } catch (IllegalStateException e) {
+            view.show("Deleted: " + selected.getTitle());
+        } catch (IllegalStateException | IllegalArgumentException e) {
             view.show(e.getMessage());
         }
     }
@@ -126,5 +202,11 @@ public class CompanyRepController {
         boolean vis = view.promptVisibility();
         internshipService.setVisibility(selected.getId(), vis);
         view.show("Visibility set to " + vis + ".");
+    }
+
+    // List detailed internships for rep
+    public void listMyInternships(CompanyRep rep) {
+        List<Internship> mine = internshipService.getInternshipsFor(rep.getCompany());
+        view.listInternships(mine, true);
     }
 }

@@ -6,6 +6,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import entity.Internship;
+import entity.Application;
 
 public class CompanyRepView {
     private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -115,6 +116,11 @@ public class CompanyRepView {
         }
     }
 
+    // Convenience overload used by controller
+    public void listInternships(List<Internship> list) {
+        listInternships(list, false);
+    }
+
     public int promptIndexSelection(int max) {
         while (true) {
             System.out.print("Select index: ");
@@ -123,6 +129,58 @@ public class CompanyRepView {
                 if (sel >= 1 && sel <= max) return sel - 1;
             } catch (NumberFormatException ignored) {}
             System.out.println("Invalid index.");
+        }
+    }
+
+    // Main menu for company rep actions
+    public int promptMainMenuOption() {
+        while (true) {
+            System.out.println();
+            System.out.println("=== Company Representative Menu ===");
+            System.out.println("1) Create Internship");
+            System.out.println("2) Edit Internship");
+            System.out.println("3) Delete Internship");
+            System.out.println("4) Toggle Visibility");
+            System.out.println("5) List My Internships (detailed)");
+            System.out.println("6) Manage Applications");
+            System.out.println("7) View internships & Manage filters");
+            System.out.println("0) Back");
+            System.out.print("Select option: ");
+            String s = sc.nextLine().trim();
+            try {
+                int opt = Integer.parseInt(s);
+                if (opt >= 0 && opt <= 7) return opt;
+            } catch (NumberFormatException ignored) {}
+            System.out.println("Invalid option.");
+        }
+    }
+
+    // Display a brief summary of an application
+    public void displayApplicationSummary(Application a) {
+        System.out.printf("%s | Student: %s | Status: %s | Date: %s | WithdrawalRequested: %b%n",
+                a.getApplicationID(), a.getStudent().getUserId(), a.getStatus(), a.getApplicationDate(), a.isWithdrawalRequested());
+    }
+
+    // List applications
+    public void listApplications(List<Application> list) {
+        if (list == null || list.isEmpty()) {
+            System.out.println("No applications found.");
+            return;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            System.out.printf("%d) ", i + 1);
+            displayApplicationSummary(list.get(i));
+        }
+    }
+
+    // Prompt approve or reject
+    public String promptApproveOrReject() {
+        while (true) {
+            System.out.print("Approve or Reject? (a/r): ");
+            String s = sc.nextLine().trim();
+            if (s.equalsIgnoreCase("a")) return "approve";
+            if (s.equalsIgnoreCase("r")) return "reject";
+            System.out.println("Invalid choice. Enter 'a' to approve or 'r' to reject.");
         }
     }
 

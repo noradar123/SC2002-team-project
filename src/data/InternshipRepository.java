@@ -8,7 +8,7 @@ public class InternshipRepository {
     private final List<Internship> internships = new ArrayList<>();
 
     // Add new internship
-    public void add(Internship internship) {
+    public void add(Internship internship) throws IllegalArgumentException {
         if (internship == null) throw new IllegalArgumentException("Internship cannot be null");
         internships.add(internship);
     }
@@ -32,7 +32,7 @@ public class InternshipRepository {
     }
 
     // Update by replacing fields
-    public Internship update(Internship updated) {
+    public Internship update(Internship updated) throws IllegalArgumentException {
         Internship existing = findById(updated.getId());
         if (existing == null) {
             throw new IllegalArgumentException("Internship not found: " + updated.getId());

@@ -97,19 +97,31 @@ public class Application {
 			throw new IllegalStateException("Application cannot be withdrawn in its current state.");
 		}
 	}
-	
+
 	/*Called by Career Center Staff after approving withdrawal request or 
 	automatically when student accepts another placement*/
 	public void markWithDrawn() {
 		this.withdrawn = true ;
 		this.status = ApplicationStatus.WITHDRAWN;
 	}
-	
+
+	// New helper: is this application active (pending or successful and not withdrawn)
+	public boolean isActive() {
+		return !this.withdrawn && (this.status == ApplicationStatus.PENDING || this.status == ApplicationStatus.SUCCESSFUL);
+	}
+
+	// New helper called when another application of the same student is accepted
+	// Withdraw this application due to the student accepting a different placement
+	public void withdrawDueToOtherAcceptance() {
+		// simply mark withdrawn and set status
+		markWithDrawn();
+	}
+
 	@Override
     public String toString() {
         return String.format("Application[ID=%s, Student=%s, Internship=%s, Status=%s, Date=%s, WithdrawalRequested=%b, Withdrawn=%b]",
             applicationID, student.getUserId(), internship.getTitle(), status, 
             applicationDate, withdrawalRequested, withdrawn);
     }
-	
+    
 }

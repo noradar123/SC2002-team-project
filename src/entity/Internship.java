@@ -92,4 +92,10 @@ public class Internship {
         this.visible = other.visible;
         this.filledSlots = other.filledSlots;
     }
+
+    // New helper used by controllers to check if the closing date has passed
+    public boolean isClosingDatePassed() {
+        if (this.closeDate == null) return false;
+        return java.time.LocalDate.now().isAfter(this.closeDate);
+    }
 }
