@@ -1,54 +1,83 @@
+package entity;
+
 import java.time.LocalDate;
 
+import enums.InternshipStatus;
+import enums.InternshipLevel;
+
+/**
+ * Filter used for report / listing of internships.
+ * Works with entity.Internship (not InternshipOpportunity).
+ */
 public class ReportFilter {
-    // Attributes
+
     private InternshipStatus status;
     private String preferredMajor;
     private InternshipLevel level;
     private String companyName;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDate startDate;  // 對應 Internship.openDate
+    private LocalDate endDate;    // 對應 Internship.closeDate
 
-    // Constructors
     public ReportFilter() {
         clearFilters();
     }
 
-    // Methods
-    public boolean applyFilter(InternshipOpportunity opportunity) {
+    /**
+     * Return true if the given internship matches current filter.
+     * If no filter is set (isValidFilter() == false), always returns true.
+     */
+    public boolean applyFilter(Internship internship) {
         if (!isValidFilter()) {
+            // 沒有設定任何過濾條件 -> 不過濾
             return true;
         }
 
         boolean matches = true;
 
-        if (status != null && !status.equals(opportunity.getStatus())) {
+        // 狀態
+        if (status != null && status != internship.getStatus()) {
             matches = false;
         }
 
-        if (preferredMajor != null && !preferredMajor.equalsIgnoreCase(opportunity.getMajor())) {
+        // Major
+        if (preferredMajor != null &&
+                (internship.getPreferredMajor() == null ||
+                 !preferredMajor.equalsIgnoreCase(internship.getPreferredMajor()))) {
             matches = false;
         }
 
-        if (level != null && !level.equals(opportunity.getLevel())) {
+        // Level
+        if (level != null && level != internship.getLevel()) {
             matches = false;
         }
 
-        if (companyName != null && !companyName.equalsIgnoreCase(opportunity.getCompanyName())) {
+        // 公司名稱
+        if (companyName != null &&
+                (internship.getCompany() == null ||
+                 !companyName.equalsIgnoreCase(internship.getCompany()))) {
             matches = false;
         }
 
-        if (startDate != null && (opportunity.getStartDate() == null || opportunity.getStartDate().isBefore(startDate))) {
-            matches = false;
+        // 開始日期（對應 Internship.openDate）
+        if (startDate != null) {
+            LocalDate open = internship.getOpenDate();
+            if (open == null || open.isBefore(startDate)) {
+                matches = false;
+            }
         }
 
-        if (endDate != null && (opportunity.getEndDate() == null || opportunity.getEndDate().isAfter(endDate))) {
-            matches = false;
+        // 結束日期（對應 Internship.closeDate）
+        if (endDate != null) {
+            LocalDate close = internship.getClosingDate();
+            if (close == null || close.isAfter(endDate)) {
+                matches = false;
+            }
         }
 
         return matches;
     }
 
+    /** 清空所有 filter 條件（回到「不過濾」狀態） */
     public void clearFilters() {
         this.status = null;
         this.preferredMajor = null;
@@ -58,12 +87,18 @@ public class ReportFilter {
         this.endDate = null;
     }
 
+    /** 是否有至少一個條件正在生效 */
     public boolean isValidFilter() {
-        return status != null || preferredMajor != null || level != null ||
-               companyName != null || startDate != null || endDate != null;
+        return status != null ||
+               preferredMajor != null ||
+               level != null ||
+               companyName != null ||
+               startDate != null ||
+               endDate != null;
     }
 
-    // Getters and Setters
+    // ---------- Getters / Setters ----------
+
     public InternshipStatus getStatus() {
         return status;
     }

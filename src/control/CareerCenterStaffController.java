@@ -3,13 +3,10 @@ package control;
 import java.util.List;
 
 import boundary.CareerCenterStaffView;
-import boundary.FilterView;
 import entity.CareerCenterStaff;
 import entity.CompanyRep;
 import entity.Internship;
 import entity.Application;
-import control.AccountCreationController;
-import control.ApplicationController;
 import service.InternshipService;
 
 public class CareerCenterStaffController {
@@ -45,17 +42,27 @@ public class CareerCenterStaffController {
         }
     }
 
+    // ============================================================
+    //                  COMPANY REP APPROVAL
+    // ============================================================
     private void manageCompanyReps() {
         List<CompanyRep> pending = accountController.getPendingCompanyReps();
-        if (pending.isEmpty()) { view.show("No pending company representative accounts."); return; }
+
+        if (pending.isEmpty()) {
+            view.show("No pending company representative accounts.");
+            return;
+        }
+
         view.listCompanyReps(pending);
         int idx = view.promptIndexSelection(pending.size());
+
         CompanyRep chosen = pending.get(idx);
         String action = view.promptApproveOrReject();
+
         try {
             if (action.equals("approve")) {
                 accountController.approveCompanyRep(chosen.getUserId());
-                view.show("Authorized: " + chosen.getUserId());
+                view.show("Authorized (activated): " + chosen.getUserId());
             } else {
                 accountController.rejectCompanyRep(chosen.getUserId());
                 view.show("Rejected and removed: " + chosen.getUserId());
@@ -65,9 +72,16 @@ public class CareerCenterStaffController {
         }
     }
 
+    // ============================================================
+    //                  INTERNSHIP APPROVAL
+    // ============================================================
     private void manageInternships() {
         List<Internship> all = internshipService.getAllInternships();
-        if (all.isEmpty()) { view.show("No internships available."); return; }
+
+        if (all.isEmpty()) {
+            view.show("No internships available.");
+            return;
+        }
         view.listInternships(all);
         int idx = view.promptIndexSelection(all.size());
         Internship chosen = all.get(idx);
@@ -85,13 +99,22 @@ public class CareerCenterStaffController {
         }
     }
 
+    // ============================================================
+    //                  WITHDRAWAL APPROVAL
+    // ============================================================
     private void manageWithdrawals() {
         List<Application> pending = applicationController.getPendingWithdrawalRequest();
-        if (pending.isEmpty()) { view.show("No pending withdrawal requests."); return; }
+
+        if (pending.isEmpty()) {
+            view.show("No pending withdrawal requests.");
+            return;
+        }
+
         view.listWithdrawalRequests(pending);
         int idx = view.promptIndexSelection(pending.size());
         Application chosen = pending.get(idx);
         String action = view.promptApproveOrReject();
+
         try {
             if (action.equals("approve")) {
                 applicationController.approveWithdrawal(chosen.getApplicationID());
@@ -100,13 +123,16 @@ public class CareerCenterStaffController {
                 applicationController.rejectWithdrawal(chosen.getApplicationID());
                 view.show("Withdrawal rejected: " + chosen.getApplicationID());
             }
+
         } catch (IllegalStateException | IllegalArgumentException e) {
             view.show(e.getMessage());
         }
     }
 
+    // ============================================================
+    //                  FILTER MANAGEMENT
+    // ============================================================
     private void manageFilters(CareerCenterStaff staff) {
-        // reuse FilterController which operates on User.getFilter()
         filterController.manageFiltersFor(staff);
     }
 }

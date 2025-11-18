@@ -40,7 +40,7 @@ public class InternshipService {
                                        InternshipLevel level, String preferredMajor,
                                        LocalDate openDate, LocalDate closeDate, int slots) {
         if (rep == null) throw new IllegalArgumentException("CompanyRep cannot be null");
-        if (!rep.isApproved()) throw new IllegalStateException("You are not approved by the Career Centre Staff.");
+        if (!rep.isAuthorized()) throw new IllegalStateException("You are not approved by the Career Centre Staff.");
         if (rep.getNumberOfInternships() >= 5) throw new IllegalStateException("Max 5 internships reached.");
         if (openDate == null || closeDate == null) throw new IllegalArgumentException("Open and close dates required");
         if (!openDate.isBefore(closeDate)) throw new IllegalArgumentException("Open date must be before close date.");

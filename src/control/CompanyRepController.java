@@ -98,7 +98,7 @@ public class CompanyRepController {
 
     // Create a new internship
     public void createInternship(CompanyRep rep) {
-        if (!rep.isApproved()) {
+        if (!rep.isAuthorized()) {
             view.show("You are not approved by the Career Centre Staff.");
             return;
         }

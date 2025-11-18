@@ -2,30 +2,57 @@ package data;
 
 import java.util.HashMap;
 import java.util.Map;
-import entity.*;
+
+import entity.User;
+import entity.Student;
+import entity.CompanyRep;
+import entity.CareerCenterStaff;
 
 public class InMemoryUserRepository implements UserRepository {
-    private final Map<String, User> store = new HashMap<>();
+    private final Map<String, User> storage = new HashMap<>();
 
     public InMemoryUserRepository() {
-        // Seed users for testing — password = "password"
-        store.put("U2345123F", new Student("U2345123F", "Alice Tan", "password", 3, "CSC"));
-        store.put("rep@company.com", new CompanyRep("rep@company.com", "Bob Rep", "password", "Acme", "Quant", "Mgr"));
-        store.put("ntu.staff", new CareerCenterStaff("ntu.staff", "Carol Staff", "password", "Careers"));
+        storage.put("staff1",
+                new CareerCenterStaff(
+                        "staff1",
+                        "NTU Career Staff",
+                        "password",
+                        "Career Centre"
+                )
+        );
+        storage.put("rep1",
+                new CompanyRep(
+                        "rep1",
+                        "Alice Rep",
+                        "password",
+                        "Acme Corp",
+                        "Tech",
+                        "HR Manager"
+                )
+        );
+        storage.put("U2345123F",
+                new Student(
+                        "U2345123F",
+                        "Bob Student",
+                        "password",
+                        3,
+                        "CSC"
+                )
+        );
     }
 
     @Override
     public User findById(String userId) {
-        return store.get(userId);
+        return storage.get(userId);
     }
 
     @Override
     public void save(User user) {
-        store.put(user.getUserId(), user);
+        storage.put(user.getUserId(), user);
     }
 
     @Override
     public boolean existsById(String userId) {
-        return store.containsKey(userId);
+        return storage.containsKey(userId);
     }
 }
