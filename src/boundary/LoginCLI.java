@@ -9,6 +9,7 @@ import control.ApplicationController;
 import control.CareerCenterStaffController;
 import control.CompanyRepController;
 import control.FilterController;
+import control.StudentController;
 
 import data.UserRepository;
 import data.InMemoryUserRepository;
@@ -16,6 +17,7 @@ import data.InternshipRepository;
 import data.ApplicationRepository;
 import data.AccountCreationRepository;
 import data.AccountCreationUserRepositoryAdapter;
+import data.CsvAccountBootstrapper;
 
 import service.InternshipService;
 
@@ -29,33 +31,12 @@ public class LoginCLI {
     public static void main(String[] args) {
         AccountCreationRepository accountCreationRepo = new AccountCreationRepository();
         UserRepository userRepo = new AccountCreationUserRepositoryAdapter(accountCreationRepo);
-        CareerCenterStaff staff1 = new CareerCenterStaff(
-                "staff1",           // userId
-                "Staff One",        // name
-                "password",         // password
-                "Career Centre"     // department
+        CsvAccountBootstrapper.loadAllUsers(
+                accountCreationRepo,
+                "src/data/sample_student_list.csv",
+                "src/data/sample_staff_list.csv",
+                "src/data/sample_company_representative_list.csv"
         );
-        accountCreationRepo.save(staff1);
-
-        CompanyRep rep1 = new CompanyRep(
-                "rep1",             // userId
-                "Rep One",          // name
-                "password",         // password
-                "Google",           // companyName
-                "HR",               // department
-                "Manager"           // position
-        );
-        rep1.setAuthorized(true);
-        accountCreationRepo.save(rep1);
-
-        Student s1 = new Student(
-                "U2345123F",       // userId
-                "Student One",     // name
-                "password",        // password
-                2,                 // yearOfStudy (1–4 都可以，你自己決定)
-                "Computer Science" // major（依你們想怎麼叫都可以）
-        );
-        accountCreationRepo.save(s1);
 
         ApplicationRepository applicationRepo = new ApplicationRepository();
         InternshipRepository internshipRepo = new InternshipRepository();
@@ -71,6 +52,7 @@ public class LoginCLI {
         CareerCenterStaffView staffView = new CareerCenterStaffView();
         FilterView filterView = new FilterView();
         CompanyRepAccountCreationView repAccountView;
+        StudentView studentView = new StudentView();
 
         // ----------------- Controllers -----------------
 
@@ -100,6 +82,13 @@ public class LoginCLI {
                         filterController
                 );
 
+        StudentController studentController = new StudentController(
+                studentView,
+                internshipService,
+                applicationController,
+                filterController
+        );
+
         repAccountView = new CompanyRepAccountCreationView(accountCreationController);
 
         // ----------------- Main CLI Loop -----------------
@@ -118,7 +107,7 @@ public class LoginCLI {
 
                 switch (choice) {
                     case "1":
-                        handleLogin(sc, authService, companyRepController, staffController);
+                        handleLogin(sc, authService, companyRepController, staffController, studentController);
                         break;
 
                     case "2":
@@ -143,7 +132,8 @@ public class LoginCLI {
     private static void handleLogin(Scanner sc,
                                     AuthService auth,
                                     CompanyRepController companyRepController,
-                                    CareerCenterStaffController staffController) {
+                                    CareerCenterStaffController staffController,
+                                    StudentController studentController) {
         System.out.print("User ID: ");
         String id = sc.nextLine().trim();
         System.out.print("Password: ");
@@ -153,13 +143,15 @@ public class LoginCLI {
             User u = auth.authenticate(id, pw);
             System.out.println("Login successful.\n");
 
-            if (u instanceof CompanyRep) {
-                companyRepController.showMain((CompanyRep) u);
-            } else if (u instanceof CareerCenterStaff) {
-                staffController.showMain((CareerCenterStaff) u);
-            } else {
-                System.out.println("Dashboard for this role is not implemented yet.");
-            }
+        if (u instanceof CompanyRep) {
+            companyRepController.showMain((CompanyRep) u);
+        } else if (u instanceof CareerCenterStaff) {
+            staffController.showMain((CareerCenterStaff) u);
+        } else if (u instanceof Student) {
+            studentController.showMain((Student) u);
+        } else {
+            System.out.println("Dashboard for this role is not implemented yet.");
+        }
 
         } catch (AuthException e) {
             System.out.println("Login failed: " + e.getMessage());

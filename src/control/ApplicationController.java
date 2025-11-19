@@ -104,11 +104,12 @@ public class ApplicationController {
 			}
 		}
 		//Check if internship is now filled //
-		Internship internship = application.getInternship();
-		int confirmedSlots = applicationRepository.countSuccessfulApplicationByInternship(internship.getTitle());
-		if (confirmedSlots >= internship.getSlots()) {
-			internship.setStatus(InternshipStatus.FILLED);
-		}
+        Internship internship = application.getInternship();
+        int confirmedSlots = applicationRepository.countSuccessfulApplicationByInternship(internship.getTitle());
+        internship.setFilledSlots(confirmedSlots); // 讓 UI 看得到最新已填人數
+        if (confirmedSlots >= internship.getSlots()) {
+            internship.setStatus(InternshipStatus.FILLED);
+        }
 		
 		return application;
 	}
