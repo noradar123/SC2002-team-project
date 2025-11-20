@@ -1,4 +1,6 @@
+package entity;
 
+import enums.WithdrawalStatus;
 import java.time.LocalDate;
 
 public class WithdrawalRequest {

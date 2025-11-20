@@ -2,6 +2,7 @@ package control;
 
 import data.UserLookupRepository;
 import data.UserWriteRepository;
+import entity.CompanyRep;
 import entity.User;
 
 public class AuthService {
@@ -25,6 +26,9 @@ public class AuthService {
         }
         if (!u.verifyPassword(rawPassword)) {
             throw new AuthException("Incorrect password. Please try again.");
+        }
+        if (u instanceof CompanyRep && !((CompanyRep) u).isAuthorized()) {
+            throw new AuthException("Your account is pending approval from Career Center Staff.");
         }
 
         return u;
