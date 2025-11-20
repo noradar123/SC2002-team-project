@@ -45,29 +45,23 @@ public class ApplicationController {
 			throw new IllegalArgumentException("Student has reached the maximum 3 active applications.");
 		}
 		
-		// Check if student already has a successful application
 		if(applicationRepository.hasSuccessfulApplication(student.getUserId())){
 			throw new IllegalArgumentException("Student already has a successful application.");
 		}
 		
-		// Year 1 and 2 can only apply for BASIC level Internship
 		if (student.getYearOfStudy() <= 2 && internship.getLevel() != InternshipLevel.BASIC) {
 			throw new IllegalArgumentException("Year 1 and 2 students are only eligible for Basic-Level Internship.");
 		}
-		//Check if internship is eligible for application 
 		if (internship.getStatus() != InternshipStatus.APPROVED) {
 			throw new IllegalArgumentException(" Internship is no longer eligible for application.");
 		}
-		//Check if internship is filled 
 		if(internship.getStatus() == InternshipStatus.FILLED) {
 			throw new IllegalArgumentException("Internship opportunity has been filled.");
 		}
-		//Check whether application deadline has passed 
 		if (internship.isClosingDatePassed()) {
 			throw new IllegalArgumentException("Application closing date has passed.");
 		}
 		
-		//create and save application
 		Application application = new Application(student, internship);
 		return applicationRepository.save(application);
 	}
@@ -106,7 +100,7 @@ public class ApplicationController {
 		//Check if internship is now filled //
         Internship internship = application.getInternship();
         int confirmedSlots = applicationRepository.countSuccessfulApplicationByInternship(internship.getTitle());
-        internship.setFilledSlots(confirmedSlots); // 讓 UI 看得到最新已填人數
+        internship.setFilledSlots(confirmedSlots);
         if (confirmedSlots >= internship.getSlots()) {
             internship.setStatus(InternshipStatus.FILLED);
         }

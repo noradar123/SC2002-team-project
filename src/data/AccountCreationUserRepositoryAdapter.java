@@ -17,7 +17,6 @@ public class AccountCreationUserRepositoryAdapter implements UserLookupRepositor
 
     @Override
     public void save(User user) {
-        // 若已存在 → update
         if (accountRepo.existsById(user.getUserId())) {
             accountRepo.update(user);
         } else {

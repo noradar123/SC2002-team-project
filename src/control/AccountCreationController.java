@@ -41,10 +41,7 @@ public class AccountCreationController {
         CompanyRep rep = new CompanyRep(
                 email, name, password, companyName, department, position
         );
-
-        // 新增帳號
         repository.save(rep);
-
         return rep;
     }
 
@@ -62,13 +59,8 @@ public class AccountCreationController {
         }
 
         CompanyRep rep = (CompanyRep) user;
-
-        // 設為已授權
         rep.setAuthorized(true);
-
-        // ★ 用 update，而不是 save（因為這個 user 已經在 list 裡了）
         repository.update(rep);
-
         return rep;
     }
 
@@ -87,14 +79,9 @@ public class AccountCreationController {
     }
 
     // ========== QUERY METHODS ==========
-
-    /** 給 CareerCenterStaffController 用，抓所有 pending reps */
     public List<CompanyRep> getPendingCompanyReps() {
-        // 你已經在 repository 有 findPendingCompanyReps()，直接用就好
         return repository.findPendingCompanyReps();
     }
-
-    /** 若之後有需要全部 user 的話（目前好像用不到） */
     public List<User> getAllUsers() {
         return repository.getAllUsers();
     }
