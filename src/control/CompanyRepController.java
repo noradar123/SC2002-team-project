@@ -61,7 +61,7 @@ public class CompanyRepController {
 
     // Manage applications for an internship (approve/reject)
     public void manageApplications(CompanyRep rep) {
-        List<Internship> mine = internshipService.getInternshipsFor(rep.getCompany());
+        List<Internship> mine = internshipService.getInternshipsFor(rep);
         if (mine.isEmpty()) {
             view.show("No internships to manage applications for.");
             return;
@@ -169,7 +169,7 @@ public class CompanyRepController {
 
     // Delete an internship
     public void deleteInternship(CompanyRep rep) {
-        List<Internship> mine = internshipService.getInternshipsFor(rep.getCompany());
+        List<Internship> mine = internshipService.getInternshipsFor(rep);
         if (mine.isEmpty()) {
             view.show("No internships to delete.");
             return;
