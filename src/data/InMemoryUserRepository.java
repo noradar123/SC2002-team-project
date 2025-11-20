@@ -8,7 +8,7 @@ import entity.Student;
 import entity.CompanyRep;
 import entity.CareerCenterStaff;
 
-public class InMemoryUserRepository implements UserRepository {
+public class InMemoryUserRepository implements UserLookupRepository, UserWriteRepository {
     private final Map<String, User> storage = new HashMap<>();
 
     public InMemoryUserRepository() {

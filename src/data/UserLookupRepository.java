@@ -2,8 +2,8 @@ package data;
 
 import entity.User;
 
-public interface UserRepository {
+public interface UserLookupRepository {
     User findById(String userId);
-    void save(User user);
     boolean existsById(String userId);
+
 }

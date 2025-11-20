@@ -2,7 +2,7 @@ package data;
 
 import entity.User;
 
-public class AccountCreationUserRepositoryAdapter implements UserRepository {
+public class AccountCreationUserRepositoryAdapter implements UserLookupRepository, UserWriteRepository{
 
     private final AccountCreationRepository accountRepo;
 

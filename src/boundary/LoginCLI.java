@@ -11,7 +11,8 @@ import control.CompanyRepController;
 import control.FilterController;
 import control.StudentController;
 
-import data.UserRepository;
+import data.UserLookupRepository;
+import data.UserWriteRepository;
 import data.InMemoryUserRepository;
 import data.InternshipRepository;
 import data.ApplicationRepository;
@@ -29,8 +30,13 @@ import entity.CareerCenterStaff;
 public class LoginCLI {
 
     public static void main(String[] args) {
+        // ---------- Repository Setup ----------
+
         AccountCreationRepository accountCreationRepo = new AccountCreationRepository();
-        UserRepository userRepo = new AccountCreationUserRepositoryAdapter(accountCreationRepo);
+        AccountCreationUserRepositoryAdapter userRepo =
+                new AccountCreationUserRepositoryAdapter(accountCreationRepo);
+
+        // Load CSV users
         CsvAccountBootstrapper.loadAllUsers(
                 accountCreationRepo,
                 "src/data/sample_student_list.csv",
@@ -41,20 +47,20 @@ public class LoginCLI {
         ApplicationRepository applicationRepo = new ApplicationRepository();
         InternshipRepository internshipRepo = new InternshipRepository();
 
-        // ----------------- Services -----------------
+        // ---------- Services ----------
 
-        AuthService authService = new AuthService(userRepo);
+        AuthService authService = new AuthService(userRepo, userRepo);
         InternshipService internshipService = new InternshipService(internshipRepo);
 
-        // ----------------- Views -----------------
+        // ---------- Views ----------
 
         CompanyRepView companyRepView = new CompanyRepView();
         CareerCenterStaffView staffView = new CareerCenterStaffView();
         FilterView filterView = new FilterView();
-        CompanyRepAccountCreationView repAccountView;
         StudentView studentView = new StudentView();
+        CompanyRepAccountCreationView repAccountView;
 
-        // ----------------- Controllers -----------------
+        // ---------- Controllers ----------
 
         AccountCreationController accountCreationController =
                 new AccountCreationController(accountCreationRepo);
@@ -91,7 +97,7 @@ public class LoginCLI {
 
         repAccountView = new CompanyRepAccountCreationView(accountCreationController);
 
-        // ----------------- Main CLI Loop -----------------
+        // ---------- Main CLI Loop ----------
 
         try (Scanner sc = new Scanner(System.in)) {
             while (true) {
@@ -129,11 +135,13 @@ public class LoginCLI {
         }
     }
 
-    private static void handleLogin(Scanner sc,
-                                    AuthService auth,
-                                    CompanyRepController companyRepController,
-                                    CareerCenterStaffController staffController,
-                                    StudentController studentController) {
+    private static void handleLogin(
+            Scanner sc,
+            AuthService auth,
+            CompanyRepController companyRepController,
+            CareerCenterStaffController staffController,
+            StudentController studentController) {
+
         System.out.print("User ID: ");
         String id = sc.nextLine().trim();
         System.out.print("Password: ");
@@ -143,15 +151,15 @@ public class LoginCLI {
             User u = auth.authenticate(id, pw);
             System.out.println("Login successful.\n");
 
-        if (u instanceof CompanyRep) {
-            companyRepController.showMain((CompanyRep) u);
-        } else if (u instanceof CareerCenterStaff) {
-            staffController.showMain((CareerCenterStaff) u);
-        } else if (u instanceof Student) {
-            studentController.showMain((Student) u);
-        } else {
-            System.out.println("Dashboard for this role is not implemented yet.");
-        }
+            if (u instanceof CompanyRep) {
+                companyRepController.showMain((CompanyRep) u);
+            } else if (u instanceof CareerCenterStaff) {
+                staffController.showMain((CareerCenterStaff) u);
+            } else if (u instanceof Student) {
+                studentController.showMain((Student) u);
+            } else {
+                System.out.println("Dashboard for this role is not implemented yet.");
+            }
 
         } catch (AuthException e) {
             System.out.println("Login failed: " + e.getMessage());
@@ -162,12 +170,12 @@ public class LoginCLI {
         System.out.print("User ID: ");
         String id = sc.nextLine().trim();
         System.out.print("Current password: ");
-        String oldPw = sc.nextLine();
+        String oldPwd = sc.nextLine();
         System.out.print("New password: ");
-        String newPw = sc.nextLine();
+        String newPwd = sc.nextLine();
 
         try {
-            auth.changePassword(id, oldPw, newPw);
+            auth.changePassword(id, oldPwd, newPwd);
             System.out.println("Password updated. Please log in again with your new password.");
         } catch (AuthException e) {
             System.out.println("Change password failed: " + e.getMessage());
