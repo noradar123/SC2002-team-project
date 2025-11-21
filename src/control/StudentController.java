@@ -10,12 +10,25 @@ import service.InternshipService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The main controller for Student operations.
+ * Handles the primary menu loop for students, orchestrating interactions between the Student View,
+ * the Internship Service (for browsing), and the Application Controller (for applying/accepting).
+ */
 public class StudentController {
     private final StudentView view;
     private final InternshipService internshipService;
     private final ApplicationController applicationController;
     private final FilterController filterController;
 
+    /**
+     * Constructs a new StudentController.
+     *
+     * @param view                  The UI view component for student interactions.
+     * @param internshipService     The service used to retrieve eligible internships.
+     * @param applicationController The controller used to handle application logic (create, withdraw, accept).
+     * @param filterController      The controller used to manage the student's search filters.
+     */
     public StudentController(StudentView view,
                              InternshipService internshipService,
                              ApplicationController applicationController,
@@ -26,6 +39,12 @@ public class StudentController {
         this.filterController = filterController;
     }
 
+    /**
+     * Displays the main menu and handles the primary navigation loop for a Student.
+     * Keeps the session active until the student chooses to log out.
+     *
+     * @param student The currently logged-in Student.
+     */
     public void showMain(Student student) {
         while (true) {
             int opt = view.promptMainMenu();
@@ -42,11 +61,20 @@ public class StudentController {
         }
     }
 
+    /**
+     * Retrieves and displays the list of internships that match the student's current filters.
+     * @param student The student viewing the list.
+     */
     private void listInternships(Student student) {
         List<Internship> internships = internshipService.getInternshipsFor(student);
         view.listInternships(internships);
     }
 
+    /**
+     * Handles the workflow for applying to a new internship.
+     * Displays available internships, prompts for selection, and delegates creation to the ApplicationController.
+     * @param student The student applying.
+     */
     private void applyToInternship(Student student) {
         List<Internship> internships = internshipService.getInternshipsFor(student);
         if (internships.isEmpty()) {
@@ -64,11 +92,20 @@ public class StudentController {
         }
     }
 
+    /**
+     * Displays the history and status of all applications submitted by the student.
+     * @param student The student viewing their history.
+     */
     private void showApplications(Student student) {
         List<Application> apps = applicationController.getApplicationByStudentId(student.getUserId());
         view.listApplications(apps);
     }
 
+    /**
+     * Handles the workflow for requesting a withdrawal from an application.
+     * Filters applications to show only those eligible for withdrawal (e.g., Pending).
+     * @param student The student requesting withdrawal.
+     */
     private void requestWithdrawal(Student student) {
         List<Application> withdrawable = applicationController.getApplicationByStudentId(student.getUserId())
                 .stream()
@@ -90,6 +127,11 @@ public class StudentController {
         }
     }
 
+    /**
+     * Handles the workflow for accepting a job offer.
+     * Filters applications to show only those with SUCCESSFUL status.
+     * @param student The student accepting the offer.
+     */
     private void acceptPlacement(Student student) {
         List<Application> successful = applicationController.getApplicationByStudentId(student.getUserId())
                 .stream()

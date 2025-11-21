@@ -10,14 +10,28 @@ import entity.Application;
 import enums.InternshipLevel;
 import enums.InternshipStatus;
 import service.InternshipService;
-
+/**
+ * Controller class for managing Company Representative operations.
+ * Handles the business logic for company representative interactions and requests.
+ */
 public class CompanyRepController {
-
+    /**
+     * Constructs a new CompanyRepController instance.
+     */
     private final CompanyRepView view;
     private final InternshipService internshipService;
     private final ApplicationController applicationController;
     private final FilterController filterController;
-
+    /**
+     * Constructs a new CompanyRepController.
+     * Initializes the controller with the specific view, services, and sub-controllers
+     * required to manage Company Representative operations.
+     *
+     * @param view                  The UI view component for the Company Representative.
+     * @param internshipService     The service class used to manage internship data.
+     * @param applicationController The controller used to manage student applications.
+     * @param filterController      The controller used to handle list filtering logic.
+     */
     public CompanyRepController(CompanyRepView view, InternshipService internshipService, ApplicationController applicationController, FilterController filterController) {
         this.view = view;
         this.internshipService = internshipService;
@@ -25,7 +39,13 @@ public class CompanyRepController {
         this.filterController = filterController;
     }
 
-    // Main menu loop for CompanyRep
+    /**
+     * Displays the main menu and handles the primary navigation for a Company Representative.
+     * This method serves as the entry point for the representative's session, allowing them to access
+     * various features such as creating, editing, or deleting internships.
+     *
+     * @param rep The currently logged-in Company Representative.
+     */
     public void showMain(CompanyRep rep) {
         while (true) {
             int opt = view.promptMainMenuOption();
@@ -59,7 +79,13 @@ public class CompanyRepController {
         }
     }
 
-    // Manage applications for an internship (approve/reject)
+    /**
+     * Manages the incoming applications for internships posted by the Company Representative.
+     * This method typically allows the representative to view, accept, or reject student applications
+     * associated with their job listings.
+     *
+     * @param rep The Company Representative managing the applications.
+     */
     public void manageApplications(CompanyRep rep) {
         List<Internship> mine = internshipService.getInternshipsFor(rep);
         if (mine.isEmpty()) {
@@ -96,7 +122,12 @@ public class CompanyRepController {
         }
     }
 
-    // Create a new internship
+    /**
+     * Initiates the process for a Company Representative to create a new internship.
+     * This method typically prompts the view for input and uses the service to save the new listing.
+     *
+     * @param rep The Company Representative object who is creating the internship.
+     */
     public void createInternship(CompanyRep rep) {
         if (!rep.isAuthorized()) {
             view.show("You are not approved by the Career Centre Staff.");
@@ -133,7 +164,13 @@ public class CompanyRepController {
         }
     }
 
-    // Edit an internship
+    /**
+     * Facilitates the editing of an existing internship listing.
+     * This method allows the Company Representative to select one of their posted internships
+     * and modify its details.
+     *
+     * @param rep The Company Representative who owns the internship to be edited.
+     */
     public void editInternship(CompanyRep rep) {
         List<Internship> mine = internshipService.getInternshipsFor(rep);
         if (mine.isEmpty()) {
@@ -167,7 +204,12 @@ public class CompanyRepController {
         }
     }
 
-    // Delete an internship
+    /**
+     * Handles the process of deleting an internship posted by a specific Company Representative.
+     * This method typically displays the representative's current listings and allows them to remove one.
+     *
+     * @param rep The Company Representative who wishes to delete an internship.
+     */
     public void deleteInternship(CompanyRep rep) {
         List<Internship> mine = internshipService.getInternshipsFor(rep);
         if (mine.isEmpty()) {
@@ -187,7 +229,13 @@ public class CompanyRepController {
         }
     }
 
-    // Toggle visibility
+    /**
+     * Toggles the visibility status of a specific internship listing.
+     * This method allows the Company Representative to select an internship and change its status
+     * (e.g., from open/visible to closed/hidden), preventing or allowing new applications.
+     *
+     * @param rep The Company Representative who owns the internship.
+     */
     public void toggleVisibility(CompanyRep rep) {
         List<Internship> mine = internshipService.getInternshipsFor(rep.getCompany());
         if (mine.isEmpty()) {
@@ -204,9 +252,14 @@ public class CompanyRepController {
         view.show("Visibility set to " + vis + ".");
     }
 
-    // List detailed internships for rep
+    /**
+     * Retrieves and displays all internships created by a specific Company Representative.
+     * This method filters the global internship list to show only those belonging to the provided representative.
+     *
+     * @param rep The Company Representative whose internships should be listed.
+     */
     public void listMyInternships(CompanyRep rep) {
-        List<Internship> mine = internshipService.getInternshipsFor(rep.getCompany());
+        List<Internship> mine = internshipService.getInternshipsFor(rep);
         view.listInternships(mine, true);
     }
 }

@@ -9,6 +9,11 @@ import entity.Internship;
 import entity.Application;
 import service.InternshipService;
 
+/**
+ * Controller responsible for managing the workflows specific to Career Center Staff.
+ * This includes administrative tasks such as approving Company Representatives,
+ * vetting new Internship listings, and processing student withdrawal requests.
+ */
 public class CareerCenterStaffController {
     private final CareerCenterStaffView view;
     private final AccountCreationController accountController;
@@ -16,6 +21,15 @@ public class CareerCenterStaffController {
     private final ApplicationController applicationController;
     private final FilterController filterController;
 
+    /**
+     * Constructs a new CareerCenterStaffController.
+     *
+     * @param view                  The UI view for staff interactions.
+     * @param accountController     The controller for managing user accounts (approvals).
+     * @param internshipService     The service for accessing and modifying internship data.
+     * @param applicationController The controller for handling student application withdrawals.
+     * @param filterController      The controller for managing search filters.
+     */
     public CareerCenterStaffController(CareerCenterStaffView view,
                                        AccountCreationController accountController,
                                        InternshipService internshipService,
@@ -28,6 +42,12 @@ public class CareerCenterStaffController {
         this.filterController = filterController;
     }
 
+    /**
+     * Displays the main menu and handles the primary navigation for a Career Center Staff member.
+     * Keeps the session active until the user chooses to log out.
+     *
+     * @param staff The currently logged-in Staff member.
+     */
     public void showMain(CareerCenterStaff staff) {
         while (true) {
             int opt = view.promptMainMenu();
@@ -45,6 +65,11 @@ public class CareerCenterStaffController {
     // ============================================================
     //                  COMPANY REP APPROVAL
     // ============================================================
+
+    /**
+     * Handles the workflow for approving or rejecting pending Company Representative accounts.
+     * Fetches pending requests, prompts the staff for a decision, and delegates to the AccountController.
+     */
     private void manageCompanyReps() {
         List<CompanyRep> pending = accountController.getPendingCompanyReps();
 
@@ -75,6 +100,11 @@ public class CareerCenterStaffController {
     // ============================================================
     //                  INTERNSHIP APPROVAL
     // ============================================================
+
+    /**
+     * Handles the workflow for approving or rejecting Internship listings.
+     * Fetches internships, allows selection, and updates their status via the InternshipService.
+     */
     private void manageInternships() {
         List<Internship> all = internshipService.getAllInternships();
 
@@ -102,6 +132,11 @@ public class CareerCenterStaffController {
     // ============================================================
     //                  WITHDRAWAL APPROVAL
     // ============================================================
+
+    /**
+     * Handles the workflow for approving or rejecting student withdrawal requests.
+     * Fetches pending applications, prompts for decision, and delegates to the ApplicationController.
+     */
     private void manageWithdrawals() {
         List<Application> pending = applicationController.getPendingWithdrawalRequest();
 
@@ -132,6 +167,11 @@ public class CareerCenterStaffController {
     // ============================================================
     //                  FILTER MANAGEMENT
     // ============================================================
+    
+    /**
+     * Delegates filter management to the FilterController.
+     * @param staff The staff member modifying their view filters.
+     */
     private void manageFilters(CareerCenterStaff staff) {
         filterController.manageFiltersFor(staff);
     }

@@ -27,8 +27,33 @@ import entity.User;
 import entity.CompanyRep;
 import entity.CareerCenterStaff;
 
+/**
+ * The main entry point for the Internship Placement Management System (IPMS).
+ * This class bootstraps the application by initializing repositories, services,
+ * controllers, and views, and then launches the main command-line interface loop.
+ */
 public class LoginCLI {
 
+    /**
+     * Constructs a new LoginCLI.
+     * (Standard default constructor).
+     */
+    public LoginCLI() {
+        // Default constructor
+    }
+
+    /**
+     * The main method that launches the application.
+     * It performs the following initialization steps:
+     * <ol>
+     * <li>Sets up data repositories and loads initial data from CSV files.</li>
+     * <li>Initializes business logic services.</li>
+     * <li>Initializes UI views and controllers, performing dependency injection.</li>
+     * <li>Starts the main menu loop for Login, Registration, and Password Management.</li>
+     * </ol>
+     *
+     * @param args Command-line arguments (unused).
+     */
     public static void main(String[] args) {
         // ---------- Repository Setup ----------
 
@@ -66,7 +91,7 @@ public class LoginCLI {
                 new AccountCreationController(accountCreationRepo);
 
         ApplicationController applicationController =
-                new ApplicationController(applicationRepo);
+                new ApplicationController(applicationRepo, internshipRepo, userRepo);
 
         FilterController filterController =
                 new FilterController(filterView, internshipService);
@@ -135,6 +160,17 @@ public class LoginCLI {
         }
     }
 
+    /**
+     * Handles the login workflow.
+     * Prompts for credentials, attempts authentication, and routes the user
+     * to the appropriate dashboard based on their role (Student, Staff, or Company Rep).
+     *
+     * @param sc                   The scanner for input.
+     * @param auth                 The authentication service.
+     * @param companyRepController Controller for Company Rep dashboard.
+     * @param staffController      Controller for Staff dashboard.
+     * @param studentController    Controller for Student dashboard.
+     */
     private static void handleLogin(
             Scanner sc,
             AuthService auth,
@@ -166,6 +202,13 @@ public class LoginCLI {
         }
     }
 
+    /**
+     * Handles the password change workflow.
+     * Prompts for User ID, old password, and new password, then delegates to the AuthService.
+     *
+     * @param sc   The scanner for input.
+     * @param auth The authentication service.
+     */
     private static void handleChangePassword(Scanner sc, AuthService auth) {
         System.out.print("User ID: ");
         String id = sc.nextLine().trim();

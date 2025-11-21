@@ -15,15 +15,34 @@ import service.InternshipService;
 
 import java.util.List;
 
+/**
+ * Controller responsible for handling the user interface interactions related to filtering internships.
+ * It allows users to interactively add or clear criteria (e.g., status, level, major) to their
+ * personalized search filter.
+ */
 public class FilterController {
     private final FilterView view;
     private final InternshipService internshipService;
 
+    /**
+     * Constructs a new FilterController.
+     *
+     * @param view              The UI view used to prompt the user for filter criteria.
+     * @param internshipService The service used to retrieve and apply filters to the internship list.
+     */
     public FilterController(FilterView view, InternshipService internshipService) {
         this.view = view;
         this.internshipService = internshipService;
     }
 
+    /**
+     * Displays the filter management menu and handles the loop for modifying user filters.
+     * The method continuously prompts the user to add specific filters or clear them,
+     * and displays the updated list of matching internships after every change.
+     *
+     * @param user The user modifying their filter settings.
+     * @throws IllegalArgumentException If the provided user is null.
+     */
     public void manageFiltersFor(User user) {
         if (user == null) throw new IllegalArgumentException("User cannot be null");
         while (true) {

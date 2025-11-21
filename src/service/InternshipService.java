@@ -13,29 +13,64 @@ import java.util.stream.Collectors;
 import enums.InternshipLevel;
 import enums.InternshipStatus;
 
+/**
+ * Service class responsible for managing Internship entities.
+ * Handles business logic for creating, retrieving, updating, and deleting internships,
+ * including validation rules for dates, slots, and company representative permissions.
+ */
 public class InternshipService {
 
     private final InternshipRepository repo;
-
+    /**
+     * Constructs a new InternshipService.
+     *
+     * @param repo The repository used for data access to Internship objects.
+     */
     public InternshipService(InternshipRepository repo) {
         this.repo = repo;
     }
 
-    // return a list of internships based on the user filter settings
+    /**
+     * Retrieves a list of internships filtered by the user's specific preferences.
+     *
+     * @param user The user whose filter settings should be applied.
+     * @return A list of {@link Internship} objects matching the user's criteria.
+     */
     public List<Internship> getInternshipsFor(User user) {
         return repo.all().stream()
                 .filter(i -> user.getFilter().matches(i))
                 .collect(Collectors.toList());
     }
 
-    // return internships for a particular company
+    /**
+     * Retrieves all internships posted by a specific company.
+     *
+     * @param company The name of the company to filter by.
+     * @return A list of {@link Internship} objects belonging to that company.
+     */
     public List<Internship> getInternshipsFor(String company) {
         return repo.all().stream()
                 .filter(i -> i.getCompany().equals(company))
                 .collect(Collectors.toList());
     }
 
-    // Create a new internship (called by CompanyRepController)
+    /**
+     * Creates a new internship listing.
+     * Validates that the Company Representative is authorized, has not exceeded their quota (max 5),
+     * and that the provided dates and slots are valid.
+     *
+     * @param rep            The Company Representative creating the internship.
+     * @param title          The title of the internship.
+     * @param description    The description of the role.
+     * @param level          The professional level (e.g., JUNIOR, SENIOR).
+     * @param preferredMajor The preferred major for applicants.
+     * @param openDate       The date applications open.
+     * @param closeDate      The date applications close.
+     * @param slots          The number of available positions.
+     * @return The newly created {@link Internship} object.
+     * @throws IllegalArgumentException If input data is invalid (nulls, dates out of order, non-positive slots).
+     * @throws IllegalStateException    If the rep is unauthorized or has reached the maximum number of internships.
+     */
     public Internship createInternship(CompanyRep rep, String title, String description,
                                        InternshipLevel level, String preferredMajor,
                                        LocalDate openDate, LocalDate closeDate, int slots) {
@@ -52,7 +87,22 @@ public class InternshipService {
         return internship;
     }
 
-    // Edit internship if status is PENDING - overloaded helper used by Controller
+    /**
+     * Edits specific fields of an existing internship using raw values.
+     * Only internships with {@code PENDING} status can be edited.
+     *
+     * @param id             The unique ID of the internship to edit.
+     * @param title          The new title (or null to keep existing).
+     * @param description    The new description (or null to keep existing).
+     * @param preferredMajor The new preferred major (or null to keep existing).
+     * @param levelStr       The new level as a String (or null to keep existing).
+     * @param openDate       The new open date (or null to keep existing).
+     * @param closeDate      The new close date (or null to keep existing).
+     * @param visibility     The new visibility status (or null to keep existing).
+     * @return The updated {@link Internship} object.
+     * @throws IllegalArgumentException If the internship is not found, level string is invalid, or dates are invalid.
+     * @throws IllegalStateException    If the internship status is not PENDING.
+     */
     public Internship editInternship(String id, String title, String description, String preferredMajor,
                                      String levelStr, LocalDate openDate, LocalDate closeDate, Boolean visibility) {
         Internship existing = repo.findById(id);
@@ -85,7 +135,15 @@ public class InternshipService {
         return repo.update(existing);
     }
 
-    // Existing edit method that accepts a full Internship object
+    /**
+     * Updates an existing internship with a new Internship object.
+     * Only internships with {@code PENDING} status can be edited.
+     *
+     * @param id      The unique ID of the internship to edit.
+     * @param updated The {@link Internship} object containing new data.
+     * @throws IllegalArgumentException If the internship is not found.
+     * @throws IllegalStateException    If the internship status is not PENDING.
+     */
     public void editInternship(String id, Internship updated) {
         Internship existing = repo.findById(id);
         if (existing == null) throw new IllegalArgumentException("Internship not found: " + id);
@@ -96,7 +154,15 @@ public class InternshipService {
         }
     }
 
-    // Delete internship (only owner and only when pending)
+    /**
+     * Deletes an internship listing.
+     * Only the owner of the internship (matching Company) can delete it, and only if it is currently PENDING.
+     *
+     * @param rep The Company Representative attempting to delete the internship.
+     * @param id  The unique ID of the internship to delete.
+     * @throws IllegalArgumentException If the internship is not found.
+     * @throws IllegalStateException    If the rep is not the owner, or the internship is not PENDING.
+     */
     public void deleteInternship(CompanyRep rep, String id) {
         Internship existing = repo.findById(id);
         if (existing == null) throw new IllegalArgumentException("Internship not found: " + id);
@@ -111,7 +177,13 @@ public class InternshipService {
         rep.decrementInternships();
     }
 
-    // Set visibility
+    /**
+     * Toggles the visibility of a specific internship.
+     *
+     * @param id      The unique ID of the internship.
+     * @param visible {@code true} to make it visible, {@code false} to hide it.
+     * @throws IllegalArgumentException If the internship is not found.
+     */
     public void setVisibility(String id, boolean visible) {
         Internship existing = repo.findById(id);
         if (existing == null) throw new IllegalArgumentException("Internship not found: " + id);
@@ -119,7 +191,12 @@ public class InternshipService {
         repo.update(existing);
     }
 
-    // Mark as filled
+    /**
+     * Checks if an internship's slots are full and updates its status if necessary.
+     * If filled, sets status to {@code FILLED} and visibility to {@code false}.
+     *
+     * @param internship The internship to check.
+     */
     public void markAsFilled(Internship internship) {
         if (internship.getFilledSlots() >= internship.getSlots()) {
             internship.setVisible(false);
@@ -128,10 +205,22 @@ public class InternshipService {
     }
 
     // --- New admin helpers ---
+    /**
+     * Retrieves a comprehensive list of all internships in the system.
+     * This is typically used by administrators.
+     *
+     * @return A list of all {@link Internship} objects.
+     */
     public java.util.List<Internship> getAllInternships() {
         return repo.all();
     }
-
+    /**
+     * Approves an internship listing.
+     * Sets the status to {@code APPROVED} and ensures it is visible.
+     *
+     * @param id The unique ID of the internship to approve.
+     * @throws IllegalArgumentException If the internship is not found.
+     */
     public void approveInternship(String id) {
         Internship existing = repo.findById(id);
         if (existing == null) throw new IllegalArgumentException("Internship not found: " + id);
@@ -139,7 +228,13 @@ public class InternshipService {
         existing.setVisible(true);
         repo.update(existing);
     }
-
+    /**
+     * Rejects an internship listing.
+     * Sets the status to {@code REJECTED} and hides it from view.
+     *
+     * @param id The unique ID of the internship to reject.
+     * @throws IllegalArgumentException If the internship is not found.
+     */
     public void rejectInternship(String id) {
         Internship existing = repo.findById(id);
         if (existing == null) throw new IllegalArgumentException("Internship not found: " + id);

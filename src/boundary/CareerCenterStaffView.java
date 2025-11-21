@@ -6,9 +6,28 @@ import entity.CompanyRep;
 import entity.Internship;
 import entity.Application;
 
+/**
+ * View class for Career Centre Staff interactions.
+ * Handles the display of the staff menu and processes menu selections
+ * for authorizing representatives, approving internships, and managing requests.
+ */
 public class CareerCenterStaffView {
+    
     private final java.util.Scanner sc = new java.util.Scanner(System.in);
 
+    /**
+     * Constructs a new CareerCenterStaffView.
+     */
+    public CareerCenterStaffView() {
+        // Default constructor
+    }
+
+    /**
+     * Displays the main menu and prompts the user for a selection.
+     * Validates input and returns a valid option (0-4).
+     *
+     * @return The selected menu option as an integer.
+     */
     public int promptMainMenu() {
         while (true) {
             System.out.println();
@@ -28,6 +47,12 @@ public class CareerCenterStaffView {
         }
     }
 
+    /**
+     * Displays a formatted list of Company Representatives.
+     * Shows details such as User ID, Company, Department, and Authorization status.
+     *
+     * @param reps The list of company representatives to display.
+     */
     public void listCompanyReps(List<CompanyRep> reps) {
         if (reps == null || reps.isEmpty()) {
             System.out.println("No pending company representative accounts.");
@@ -40,6 +65,12 @@ public class CareerCenterStaffView {
         }
     }
 
+    /**
+     * Displays a formatted list of Internships.
+     * Shows details such as Title, Level, Slots, and Visibility status.
+     *
+     * @param list The list of internships to display.
+     */
     public void listInternships(List<Internship> list) {
         if (list == null || list.isEmpty()) {
             System.out.println("No internships.");
@@ -52,6 +83,12 @@ public class CareerCenterStaffView {
         }
     }
 
+    /**
+     * Displays a formatted list of Applications that have requested withdrawal.
+     * Shows details such as Application ID, Student ID, and Internship Title.
+     *
+     * @param apps The list of applications to display.
+     */
     public void listWithdrawalRequests(List<Application> apps) {
         if (apps == null || apps.isEmpty()) {
             System.out.println("No pending withdrawal requests.");
@@ -64,6 +101,13 @@ public class CareerCenterStaffView {
         }
     }
 
+    /**
+     * Prompts the user to select an index from a list.
+     * Input is validated to ensure it is a number within the valid range (1 to max).
+     *
+     * @param max The maximum valid index (size of the list).
+     * @return The 0-based index selected by the user.
+     */
     public int promptIndexSelection(int max) {
         while (true) {
             System.out.print("Select index: ");
@@ -75,6 +119,11 @@ public class CareerCenterStaffView {
         }
     }
 
+    /**
+     * Prompts the user to make an Approve or Reject decision.
+     *
+     * @return "approve" if user enters 'a', or "reject" if user enters 'r'.
+     */
     public String promptApproveOrReject() {
         while (true) {
             System.out.print("Approve or Reject? (a/r): ");
@@ -85,5 +134,10 @@ public class CareerCenterStaffView {
         }
     }
 
+    /**
+     * Displays a generic message string to the console.
+     *
+     * @param msg The message to display.
+     */
     public void show(String msg) { System.out.println(msg); }
 }

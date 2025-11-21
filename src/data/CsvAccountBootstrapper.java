@@ -8,7 +8,29 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * Utility class responsible for bootstrapping (seeding) user accounts from CSV files.
+ * This class parses external CSV data and populates the {@link AccountCreationRepository}
+ * with initial Student, Staff, and Company Representative accounts.
+ */
 public class CsvAccountBootstrapper {
+
+    /**
+     * Constructs a new CsvAccountBootstrapper.
+     * (Note: This class is primarily used via its static methods).
+     */
+    public CsvAccountBootstrapper() {
+        // Default constructor
+    }
+
+    /**
+     * Orchestrates the loading of all user types into the repository.
+     *
+     * @param repo          The repository where user accounts will be saved.
+     * @param studentCsv    The file path to the Student CSV data.
+     * @param staffCsv      The file path to the Career Center Staff CSV data.
+     * @param companyRepCsv The file path to the Company Representative CSV data.
+     */
     public static void loadAllUsers(AccountCreationRepository repo,
                                     String studentCsv,
                                     String staffCsv,
@@ -19,12 +41,20 @@ public class CsvAccountBootstrapper {
     }
 
     // ===================== Students =====================
+
+    /**
+     * Parses the Student CSV file and saves entities to the repository.
+     * Expected CSV format: ID, Name, Major, Year.
+     *
+     * @param repo The repository to save to.
+     * @param path The CSV file path.
+     */
     private static void loadStudents(AccountCreationRepository repo, String path) {
         if (path == null) return;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
-            br.readLine();
+            br.readLine(); // skip header
 
             while ((line = br.readLine()) != null) {
                 if (line.isBlank()) continue;
@@ -37,6 +67,7 @@ public class CsvAccountBootstrapper {
                 String major = p[2].trim();
                 int year     = Integer.parseInt(p[3].trim());
 
+                // Default password is set to the User ID
                 String password = id;
                 Student s = new Student(id, name, password, year, major);
                 repo.save(s);
@@ -48,13 +79,21 @@ public class CsvAccountBootstrapper {
     }
 
     // ===================== Staff =====================
+
+    /**
+     * Parses the Staff CSV file and saves entities to the repository.
+     * Expected CSV format: ID, Name, Role, Department.
+     *
+     * @param repo The repository to save to.
+     * @param path The CSV file path.
+     */
     private static void loadStaff(AccountCreationRepository repo, String path) {
         if (path == null) return;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
 
-            br.readLine();
+            br.readLine(); // skip header
 
             while ((line = br.readLine()) != null) {
                 if (line.isBlank()) continue;
@@ -64,7 +103,7 @@ public class CsvAccountBootstrapper {
 
                 String id   = p[0].trim();
                 String name = p[1].trim();
-                String role = p[2].trim();
+                // String role = p[2].trim(); // Role unused in constructor, kept for CSV alignment
                 String dept = p[3].trim();
                 // String email = p[4].trim();
 
@@ -78,13 +117,21 @@ public class CsvAccountBootstrapper {
     }
 
     // ===================== Company Representatives =====================
+
+    /**
+     * Parses the Company Representative CSV file and saves entities to the repository.
+     * Expected CSV format: ID, Name, Company, Department, Position.
+     *
+     * @param repo The repository to save to.
+     * @param path The CSV file path.
+     */
     private static void loadCompanyReps(AccountCreationRepository repo, String path) {
         if (path == null) return;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
 
-            br.readLine(); // header
+            br.readLine(); // skip header
 
             while ((line = br.readLine()) != null) {
                 if (line.isBlank()) continue;
